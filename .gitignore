@@ -1,0 +1,4 @@
+data/*
+logs/*
+*/__pycache__/*
+*/crawler.egg-info/*git add .

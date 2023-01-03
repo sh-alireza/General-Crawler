@@ -18,20 +18,26 @@ class Image_Downloader(BaseDownloader):
             path = self.make_folder(col)
             
             if not os.path.exists(path):
-                print("something's wrong with save_path")
-            
+                self.logger.error("something's wrong with save_path")
+            self.logger.info(f"Downloading {col} files")
             for i,link in enumerate(links_dict[col]):
-                response = requests.get(link,stream=True)
+                
+                try:
+                    response = requests.get(link,stream=True)
+                except:
+                    self.logger.error(f"Error downloading {link}")
+                    continue
+                
                 d_name = datetime.now().strftime('%Y%m-%d%H-%M%S-') + str(uuid4())
                 
                 if i == 0:
                     d_name+="_main"
-                    
+                
                 image = Image.open(response.raw)
                 image = ImageOps.exif_transpose(image)
                 image = image.convert("RGB")
                 image.save(os.path.join(path,d_name+".jpg"))
-
+            self.logger.info(f"Downloaded {col} files")
     def handle(self):
         download_links = self.get_links_from_database("products",["images"])
         self.download_links(download_links)

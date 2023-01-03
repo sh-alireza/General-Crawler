@@ -40,6 +40,7 @@ class BaseDownloader():
         connection = sqlite3.connect(self.main_db_path)
         cursor = connection.cursor()
         download_links = defaultdict(list)
+        self.logger.info(f"Getting {table} links from database")
         for col in downloadables:
             cursor.execute(f"SELECT {col} from {table}")
             data = cursor.fetchall()
@@ -58,8 +59,4 @@ class BaseDownloader():
                     download_links[col].append(l)
 
         return download_links
-
-    def check_download_type(self):
-        
-        pass
     

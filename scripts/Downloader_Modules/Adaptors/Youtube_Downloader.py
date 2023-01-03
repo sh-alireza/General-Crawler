@@ -63,7 +63,7 @@ class Youtube_Downloader(BaseDownloader):
 
             if not os.path.exists(path):
                 self.logger.error("something's wrong with save_path")
-
+            self.logger.info(f"Downloading {col} files")
             for i,link in enumerate(links_dict[col]):
                 outtmpl = os.path.join(path, '%(id)s.%(ext)s')
                 add_header = self.get_random_header()
@@ -81,9 +81,7 @@ class Youtube_Downloader(BaseDownloader):
                         'outtmpl': outtmpl,
                         'add_header': add_header,
                     }
-                    ydl_opts = {'add_header': {'User-Agent': 'Mozilla/5.0 (Linux; Android 5.0.2; SM-T530NU Build/LRX22G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.133 Safari/537.36'}, 'outtmpl': u'..data/downloaded_files/youtube/video_link/%(id)s.%(ext)s', 'format': 'best[height>=0][height<=480][ext=mp4]'}
-                    import pdb
-                    pdb.set_trace()
+                    
                     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                         ydl.download([link])
 
