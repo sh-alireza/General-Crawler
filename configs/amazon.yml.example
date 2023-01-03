@@ -1,0 +1,3 @@
+Words: ['bed','chair','dresser','lamp','sofa','table'] # only these words are supported
+Limit: 1
+Canada_Shipment_Filter: "True"

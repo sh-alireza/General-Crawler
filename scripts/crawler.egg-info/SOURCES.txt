@@ -1,0 +1,10 @@
+setup.py
+Crawler_Modules/BaseCrawler.py
+Crawler_Modules/__init__.py
+Downloader_Modules/BaseDownloader.py
+Downloader_Modules/__init__.py
+crawler.egg-info/PKG-INFO
+crawler.egg-info/SOURCES.txt
+crawler.egg-info/dependency_links.txt
+crawler.egg-info/entry_points.txt
+crawler.egg-info/top_level.txt

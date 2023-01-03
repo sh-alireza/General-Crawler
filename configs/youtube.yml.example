@@ -1,0 +1,5 @@
+Download_Type: "av" # only video=v / only audio=a / both=av
+Search_Queries: ["andrew ng machine learning course","how to train a detection model"]
+Limit: 5
+Min_Resolution: 0
+Max_Resolution: 480
