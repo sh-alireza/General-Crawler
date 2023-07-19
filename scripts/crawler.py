@@ -3,16 +3,16 @@ import os
 from typing import List
 
 import inquirer
-from Crawler_Modules import *
-from Downloader_Modules import *
+from scripts.Crawler_Modules import *
+from scripts.Downloader_Modules import *
 from inquirer.themes import GreenPassion
-from To_csv import To_csv
+from scripts.To_csv import To_csv
 
 
 # define the function that gets the downloader flags
 def get_downloader_flags() -> List[str]:
     # Return a list of the files in the Downloader_Modules/Adaptors directory
-    return os.listdir("Downloader_Modules/Adaptors")
+    return os.listdir(os.path.join(os.getcwd(),"scripts/Downloader_Modules/Adaptors"))
 
 # define the function that gets the crawler flags
 
@@ -24,7 +24,7 @@ def get_crawler_flags() -> List[str]:
         A list of all crawler flags from the Adaptors directory.
     """
     # List all files in the Adaptors directory
-    all_files = os.listdir("Crawler_Modules/Adaptors")
+    all_files = os.listdir(os.path.join(os.getcwd(),"scripts/Crawler_Modules/Adaptors"))
 
     # Return all files in the Adaptors directory
     return all_files
@@ -172,10 +172,13 @@ def csv(site_flag):
     :return: None
     '''
     # Get a list of all the databases
-    db_list = os.listdir("../data/databases")
+    db_list = os.listdir(os.path.join(os.getcwd(),"data/databases"))
     # Loop through all the databases
     for db in db_list:
         # If the site flag is in the database
         if site_flag in db:
-            tocsv = To_csv(os.path.join("../data/databases", db))
+            tocsv = To_csv(os.path.join(os.getcwd(),"data/databases", db))
             tocsv.handle()
+
+if __name__ == "__main__":
+    start()

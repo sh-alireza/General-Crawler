@@ -38,6 +38,7 @@ class Image_Downloader(BaseDownloader):
                 image = image.convert("RGB")
                 image.save(os.path.join(path,d_name+".jpg"))
             self.logger.info(f"Downloaded {col} files")
+    
     def handle(self):
         download_links = self.get_links_from_database("products",["images"])
         self.download_links(download_links)

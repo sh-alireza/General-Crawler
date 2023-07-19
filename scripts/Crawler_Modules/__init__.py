@@ -18,6 +18,7 @@ for (_, module_name, _) in iter_modules([package_dir]):
         if isclass(attribute):            
             # Add the class to this package's variables
             globals()[attribute_name] = attribute
+            
 package_dir2 = os.path.join(package_dir,"Adaptors")
 for (_, module_name, _) in iter_modules([package_dir2]):
     # import the module and iterate through its attributes
