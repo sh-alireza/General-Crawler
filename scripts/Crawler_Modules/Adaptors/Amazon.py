@@ -60,7 +60,8 @@ class Amazon(BaseCrawler):
             self.words = answers["words"]
             self.canada_shipment_filter = answers["canada"]
         
-        self.database_path = "../data/databases/database_amazon.db"
+        self.database_path = os.path.join(os.getcwd(),"data/databases/database_amazon.db")
+        
         self.connection = sqlite3.connect(self.database_path)
         self.cursor = self.connection.cursor()
         self.cursor.execute("CREATE TABLE IF NOT EXISTS products (id INTEGER PRIMARY KEY,product_title TEXT,\
@@ -96,9 +97,9 @@ class Amazon(BaseCrawler):
                 time.sleep(2.5)
                 canada = "False"
             except:
-                print('net problem')
+                self.logger.info('Amazon: net problem')
                 self.driver.get(url)
-        print("done")
+        self.logger.info("Amazon: canada filter done")
 
     def get_cards_from_site(self,url,canada):
         self.driver.get(url)
@@ -145,13 +146,13 @@ class Amazon(BaseCrawler):
             try:
                 if elem.get_attribute("innerHTML").strip().lower() == "style":
                     style = elem.find_element(By.XPATH,"..").find_element(By.CLASS_NAME,"prodDetAttrValue").get_attribute("innerHTML").strip().lower().encode('ascii', 'ignore').decode("utf-8")
-                    print(style)
+                    
                     break
                 else:
                     style="none"
             except:
                 style="none"
-                print(style)
+                
                 continue
         
         WebDriverWait(self.driver, 10).until(

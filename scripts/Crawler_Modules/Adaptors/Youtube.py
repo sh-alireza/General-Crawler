@@ -189,6 +189,7 @@ class Youtube(BaseCrawler):
                 cards_cells = self.driver.find_elements(
                     By.TAG_NAME, "ytd-item-section-renderer")
                 cards = []
+                
                 for cell in cards_cells:
                     cardss = cell.find_element(By.ID, "contents").find_elements(
                         By.TAG_NAME, "ytd-video-renderer")

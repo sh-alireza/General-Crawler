@@ -33,7 +33,7 @@ class Youtube_Downloader(BaseDownloader):
         answers = inquirer.prompt(questions, theme=GreenPassion())
         
         
-        self.headers_directory = "../resources/headers.txt"
+        self.headers_directory = os.getcwd()+"/resources/headers.txt"
         self.type = answers['type']
         self.min_res = eval(answers['minres'])
         self.max_res = eval(answers['maxres'])

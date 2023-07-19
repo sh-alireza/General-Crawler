@@ -92,7 +92,7 @@ class Houzz(BaseCrawler):
         # loop through all the departments and add them to the list
         for key in list(self.all_departments.keys()):
             deps += self.all_departments[key]
-        all_styles = ['asian', 'contemporary', 'modern', 'transitional', 'craftsman', 'farmhouse', 'rustic',
+        self.all_styles = ['asian', 'contemporary', 'modern', 'transitional', 'craftsman', 'farmhouse', 'rustic',
                       'southwestern', 'midcentury', 'scandinavian', 'victorian', 'traditional', 'mediterranean', 'industrial', 'tropical']
         # if a config file is provided, read the data from it
         if config_path:
@@ -117,7 +117,7 @@ class Houzz(BaseCrawler):
                                   ),
                 inquirer.Checkbox('styles',
                                   message='Which styles do you want to crawl?',
-                                  choices=all_styles,
+                                  choices=self.all_styles,
                                   default=['transitional']
                                   ),
                 inquirer.List('canada',
@@ -133,7 +133,8 @@ class Houzz(BaseCrawler):
             self.styles = answers["styles"]
             self.canada_shipment_filter = answers["canada"]
 
-        self.database_path = "../data/databases/database_houzz.db"
+        self.database_path = os.path.join(os.getcwd(),"data/databases/database_houzz.db")
+        
         self.values = list(self.all_departments.values())
         self.words = list(self.all_departments.keys())
         self.connection = sqlite3.connect(self.database_path)
@@ -159,7 +160,7 @@ class Houzz(BaseCrawler):
         return True
     # get the links of all the products in the page 
     def get_cards_from_site(self, link):
-        self.logger.info(f"Getting cards from {link}")
+        self.logger.info(f"Houzz: Getting cards from {link}")
         self.driver.get(link)
         self.driver.refresh()
 
@@ -197,6 +198,10 @@ class Houzz(BaseCrawler):
         try:
             velems = self.driver.find_elements(
                 By.CLASS_NAME, "alt-video__thumb")
+            
+            if len(velems) == 0:
+                raise Exception
+            
             for velem in velems:
                 self.driver.execute_script(
                     "arguments[0].setAttribute('style',arguments[1])", velem, "display:none;")
@@ -240,6 +245,9 @@ class Houzz(BaseCrawler):
             else:
                 style = "none"
 
+            if style in self.all_styles:
+                break
+            
         if style == "none":
             return "continue"
 
@@ -386,17 +394,17 @@ class Houzz(BaseCrawler):
                 card_specifications = self.get_card_specifications(card_link)
                 if card_specifications == "err":
                     self.logger.error(
-                        f"Error in card {card_link}: couldn't get the right word")
+                        f"Houzz: Error in card {card_link}: couldn't get the right word")
                     continue
 
                 if card_specifications == "continue":
                     self.logger.error(
-                        f"Error in card {card_link}: couldn't get the right style")
+                        f"Houzz: Error in card {card_link}: couldn't get the right style")
                     continue
 
             except Exception as e:
                 try:
-                    self.logger.warning(e)
+                    self.logger.warning("Houzz: "+str(e))
                     self.cursor.execute(
                         f"INSERT INTO failed (main_link,error,time) VALUES ('{card_link}','{e}','{datetime.now()}')")
                     self.connection.commit()
@@ -432,7 +440,7 @@ class Houzz(BaseCrawler):
 
             except Exception as e:
                 try:
-                    self.logger.warning(e)
+                    self.logger.warning("Houzz: " + str(e))
                     self.cursor.execute(
                         f"INSERT INTO failed (main_link,error,time) VALUES ('{card_link}','{e}','{datetime.now()}')")
                     self.connection.commit()
@@ -441,7 +449,7 @@ class Houzz(BaseCrawler):
 
                 continue
 
-            self.logger.info(f"{count} - {card_link}")
+            self.logger.info(f"Houzz: {count} - {card_link}")
             count += 1
             if count >= self.limit:
                 break
@@ -455,12 +463,12 @@ class Houzz(BaseCrawler):
         else:
             url = f"https://www.houzz.com/products/{main_style}/{main_dep}/p/{page_number*36}"
 
-        self.logger.info(f"Scraping page {url}")
+        self.logger.info(f"Houzz: Scraping page {url}")
 
         try:
             cards = self.get_cards_from_site(url)
         except Exception as e:
-            self.logger.warning(e)
+            self.logger.warning("Houzz: " + str(e))
             time.sleep(30)
             if "session" in str(e):
                 try:
@@ -469,18 +477,12 @@ class Houzz(BaseCrawler):
                     cards = self.get_cards_from_site(url)
                 except:
                     pass
-            else:
-                page_number += 1
-                if page_number > 10:
-                    return count
-
-                return count
 
             return count
 
-        if len(cards) == 0:
-            return count
-        count = self.loop_on_cards(cards, count, main_dep, main_style)
+        if len(cards) != 0:
+            count = self.loop_on_cards(cards, count, main_dep, main_style)
+            
         return count
     # main function
     def handle(self):
@@ -493,3 +495,5 @@ class Houzz(BaseCrawler):
                     count = self.scrape_page(
                         page_number, count, main_dep, main_style)
                     page_number += 1
+                    if page_number > 10:
+                        break

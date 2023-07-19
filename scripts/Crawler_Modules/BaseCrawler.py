@@ -2,7 +2,7 @@ from selenium import webdriver
 from decouple import config
 import logging
 from logging.handlers import RotatingFileHandler
-
+import os
 
 
 class BaseCrawler():
@@ -10,8 +10,8 @@ class BaseCrawler():
     # init method or constructor
     def __init__(self):
         
-        self.save_path = config("SAVE_PATH")
-        self.chromedriver_path = config("CHROMEDRIVER_PATH")
+        self.save_path = os.path.join(os.getcwd(), config("SAVE_PATH"))
+        self.chromedriver_path = os.path.join(os.getcwd(), config("CHROMEDRIVER_PATH"))
         
         # driver configuration
         self.options = webdriver.ChromeOptions()
@@ -24,7 +24,14 @@ class BaseCrawler():
         format = logging.Formatter("%(asctime)s - %(lineno)d - %(levelname)s - %(message)s")
         self.logger = logging.getLogger('crawler_logger')
         self.logger.setLevel(logging.DEBUG)
-        handler = RotatingFileHandler('../logs/crawler-logs/crawler.logs', mode="a", maxBytes=5000000, backupCount=5)
+        
+        if not os.path.exists(os.path.join(os.getcwd(),"data/databases")):
+            os.makedirs(os.path.join(os.getcwd(),"data/databases"))
+            
+        if not os.path.exists(os.getcwd() + "/logs/crawler-logs"):
+            os.makedirs(os.getcwd() + "/logs/crawler-logs")
+
+        handler = RotatingFileHandler(os.getcwd() + '/logs/crawler-logs/crawler.logs', mode="a", maxBytes=5000000, backupCount=5)
         handler.setFormatter(format)
         self.logger.addHandler(handler)
         
